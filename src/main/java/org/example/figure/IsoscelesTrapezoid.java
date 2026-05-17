@@ -1,4 +1,4 @@
-package org.example;
+package org.example.figure;
 
 public class IsoscelesTrapezoid extends Figure {
     private double topBase;

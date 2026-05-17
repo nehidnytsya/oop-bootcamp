@@ -1,4 +1,4 @@
-package org.example;
+package org.example.figure;
 
 public abstract class Figure {
     private final String color;

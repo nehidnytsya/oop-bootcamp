@@ -1,4 +1,4 @@
-package org.example;
+package org.example.figure;
 
 public class RightTriangle extends Figure {
     private double firstLeg;
