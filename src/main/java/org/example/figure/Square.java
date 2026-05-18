@@ -1,7 +1,7 @@
 package org.example.figure;
 
 public class Square extends Figure {
-    private double side;
+    private final double side;
 
     public Square(double side, String color) {
         super(color);

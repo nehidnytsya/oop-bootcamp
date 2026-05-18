@@ -4,39 +4,27 @@ import org.example.exception.FigureNotFoundException;
 import org.example.figure.Figure;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class FigureStorage<T extends Figure> {
-    private List<T> storage;
-    private Map<Integer, T> idMap;
-    private int nextId;
-
-    public FigureStorage() {
-        this.storage = new ArrayList<>();
-        this.idMap = new HashMap<>();
-        this.nextId = 1;
-    }
+    private final List<T> figures = new ArrayList<>();
 
     public void add(T figure) {
-        storage.add(figure);
-        idMap.put(nextId++, figure);
+        figures.add(figure);
     }
 
     public T getById(int id) {
-        T figure = idMap.get(id);
-        if (figure == null) {
+        if (id < 0 || id >= figures.size()) {
             throw new FigureNotFoundException("Figure #" + id + " not found");
         }
-        return figure;
+        return figures.get(id);
     }
 
     public int size() {
-        return storage.size();
+        return figures.size();
     }
 
     public List<T> getAll() {
-        return new ArrayList<>(storage);
+        return new ArrayList<>(figures);
     }
 }

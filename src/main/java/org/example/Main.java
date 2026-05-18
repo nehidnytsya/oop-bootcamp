@@ -17,8 +17,9 @@ public class Main {
 
         System.out.println("Storage size: " + storage.size());
 
-        System.out.println("\n--- getById ---");
-        for (int id = 1; id <= storage.size() + 2; id++) {
+        System.out.println("\n--- getById (loop survives FigureNotFoundException) ---");
+        int[] idsToTry = {0, 1, 2, 42, 3, 999};
+        for (int id : idsToTry) {
             try {
                 Figure fig = storage.getById(id);
                 System.out.println("ID " + id + ": " + fig.getClass().getSimpleName() +
@@ -27,8 +28,6 @@ public class Main {
                 System.out.println(e.getMessage());
             }
         }
-
-        System.out.println("\n--- Proving loop survives exception ---");
         System.out.println("Loop completed successfully!");
 
         System.out.println("\n--- Annotation analysis ---");

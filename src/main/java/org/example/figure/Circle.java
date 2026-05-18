@@ -6,7 +6,7 @@ public class Circle extends Figure {
     public static final double DEFAULT_RADIUS = 10.0;
     public static final String DEFAULT_COLOR = "white";
 
-    private double radius;
+    private final double radius;
 
     public Circle() {
         this(DEFAULT_RADIUS, DEFAULT_COLOR);

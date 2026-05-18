@@ -1,7 +1,6 @@
 package org.example.util;
 
 import org.example.annotation.DefaultArea;
-import org.example.exception.FigureNotFoundException;
 import org.example.figure.Figure;
 import org.example.storage.FigureStorage;
 
@@ -23,7 +22,7 @@ public class AnnotationUtils {
                             " + " + clazz.getSimpleName() + ".getArea() is DEFAULT" :
                             " - " + clazz.getSimpleName() + ".getArea() is NOT default");
                 } catch (NoSuchMethodException e) {
-                    System.out.println("  " + clazz.getSimpleName() + " - method not found");
+                    throw new RuntimeException("Unexpected: getArea() not found in " + clazz.getName(), e);
                 }
             }
         }
