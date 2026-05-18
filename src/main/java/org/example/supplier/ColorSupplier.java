@@ -12,7 +12,7 @@ public class ColorSupplier {
             "white"
     };
 
-    private Random random = new Random();
+    private final Random random = new Random();
 
     public String getRandomColor() {
         int index = random.nextInt(colors.length);

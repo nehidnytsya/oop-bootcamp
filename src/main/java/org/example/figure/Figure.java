@@ -1,5 +1,7 @@
 package org.example.figure;
 
+import java.util.Objects;
+
 public abstract class Figure {
     private final String color;
 
@@ -16,5 +18,18 @@ public abstract class Figure {
 
     public String getColor() {
         return color;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Figure figure = (Figure) o;
+        return Objects.equals(color, figure.color);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(color);
     }
 }
