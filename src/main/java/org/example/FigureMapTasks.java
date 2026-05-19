@@ -19,14 +19,13 @@ public class FigureMapTasks {
         figures.forEach(Figure::draw);
 
 
+        // 1) GROUPING BY TYPE
         System.out.println("\n=== 1) GROUPING BY TYPE ===");
 
         Map<String, List<Figure>> byType = new HashMap<>();
 
         for (Figure fig : figures) {
-            String typeName = fig.getClass().getSimpleName();
-
-            byType.computeIfAbsent(typeName, k -> new ArrayList<>()).add(fig);
+            byType.computeIfAbsent(fig.getClass().getSimpleName(), k -> new ArrayList<>()).add(fig);
         }
 
         System.out.println("Figure groups:");
@@ -39,6 +38,7 @@ public class FigureMapTasks {
         });
 
 
+        // 2) UNIQUE FIGURES BY COLOR
         System.out.println("\n=== 2) UNIQUE FIGURES BY COLOR ===");
 
         Map<String, Set<Figure>> byColor = new HashMap<>();
@@ -47,24 +47,43 @@ public class FigureMapTasks {
             byColor.computeIfAbsent(fig.getColor(), k -> new HashSet<>()).add(fig);
         }
 
-        System.out.println("\nVerification: adding duplicate figure to existing Set by color:");
-        if (byColor.containsKey("blue")) {
-            Square duplicateSquare = new Square(5, "blue");
-            int sizeBefore = byColor.get("blue").size();
-            byColor.get("blue").add(duplicateSquare);
-            int sizeAfter = byColor.get("blue").size();
-            System.out.printf("  Set size for 'blue' before: %d, after adding duplicate: %d → %s%n",
-                    sizeBefore, sizeAfter,
-                    sizeBefore == sizeAfter ? "duplicate rejected ✓" : "duplicate added ✗");
-        }
+        String anyColor = byColor.keySet().iterator().next();
+        Figure anyFig   = byColor.get(anyColor).iterator().next();
+
+        int sizeBefore = byColor.get(anyColor).size();
+        byColor.get(anyColor).add(anyFig);
+        int sizeAfter  = byColor.get(anyColor).size();
+
+        System.out.printf(
+                "%nVerification: adding duplicate to Set[\"%s\"] — before: %d, after: %d → %s%n",
+                anyColor, sizeBefore, sizeAfter,
+                sizeBefore == sizeAfter ? "duplicate rejected ✓" : "duplicate added ✗"
+        );
+
+        System.out.println("\nVerification with two separate but equal objects:");
+        Square sq1 = new Square(5, "blue");
+        Square sq2 = new Square(5, "blue");
+        Set<Figure> testSet = new HashSet<>();
+        testSet.add(sq1);
+        testSet.add(sq2);
+        System.out.printf(
+                "  sq1.equals(sq2)=%b | testSet.size()=%d (expected 1) → %s%n",
+                sq1.equals(sq2), testSet.size(),
+                testSet.size() == 1 ? "equals/hashCode OK ✓" : "equals/hashCode BROKEN ✗"
+        );
 
         System.out.println("\nSet size by color:");
         byColor.forEach((color, set) ->
                 System.out.printf("  %-8s → %d unique figures%n", color, set.size()));
 
 
+        // 3) TOP-3 LARGEST FIGURES
         System.out.println("\n=== 3) TOP-3 LARGEST FIGURES ===");
 
+        // list.sort()          — метод інтерфейсу List (з Java 8), делегує до Arrays.sort()
+        // Collections.sort()   — статичний утилітний метод, сам делегує до list.sort()
+        // Для мене різниці немає обидва стабільні, результат такий саммий
+        // list.sort() є більш сучасним і читабельним, тому він
         List<Figure> sortedFigures = new ArrayList<>(figures);
         sortedFigures.sort(Comparator.comparingDouble(Figure::getArea).reversed());
 
@@ -77,6 +96,7 @@ public class FigureMapTasks {
                         fig.getArea()));
 
 
+        // 4) AVERAGE AREA BY COLOR
         System.out.println("\n=== 4) AVERAGE AREA BY COLOR ===");
 
         Map<String, double[]> sumAndCount = new HashMap<>();
@@ -94,16 +114,14 @@ public class FigureMapTasks {
         }
 
         System.out.println("Average area by color:");
-        sumAndCount.forEach((color, arr) -> {
-            double average = arr[0] / arr[1];
-            System.out.printf("  %-8s : %.2f%n", color, average);
-        });
+        sumAndCount.forEach((color, arr) ->
+                System.out.printf("  %-8s : %.2f%n", color, arr[0] / arr[1]));
 
 
+        // 5) IMMUTABLE CATALOG
         System.out.println("\n=== 5) IMMUTABLE CATALOG ===");
 
-        Map<String, List<Figure>> originalMap = byType;
-        Map<String, List<Figure>> catalog = Collections.unmodifiableMap(originalMap);
+        Map<String, List<Figure>> catalog = Collections.unmodifiableMap(byType);
 
         System.out.println("Catalog size (via wrapper): " + catalog.size());
 
@@ -111,17 +129,15 @@ public class FigureMapTasks {
         try {
             catalog.put("Test", new ArrayList<>());
         } catch (UnsupportedOperationException e) {
-            System.out.println("  " + e.getClass().getSimpleName() + " — wrapper is protected from writes!");
+            System.out.println("  " + e.getClass().getSimpleName()
+                    + " — wrapper blocks all write operations!");
         }
 
-
-        if (!originalMap.isEmpty()) {
-            String firstKey = originalMap.keySet().iterator().next();
-            originalMap.get(firstKey).add(supplier.getRandomFigure());
-        }
+        String firstKey = byType.keySet().iterator().next();
+        byType.get(firstKey).add(supplier.getRandomFigure());
 
         int sizeViaWrapper = catalog.values().stream().mapToInt(List::size).sum();
-        int sizeViaOriginal = originalMap.values().stream().mapToInt(List::size).sum();
+        int sizeViaOriginal = byType.values().stream().mapToInt(List::size).sum();
         System.out.println("\nAfter adding a figure to the original map:");
         System.out.println("  Size via wrapper  : " + sizeViaWrapper);
         System.out.println("  Size via original : " + sizeViaOriginal);
