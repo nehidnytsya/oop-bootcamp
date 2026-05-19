@@ -1,9 +1,18 @@
 package org.example;
 
-import org.example.figure.*;
+import org.example.figure.Figure;
+import org.example.figure.Square;
 import org.example.supplier.FigureSupplier;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 public class FigureMapTasks {
 
@@ -29,7 +38,7 @@ public class FigureMapTasks {
         }
 
         System.out.println("Figure groups:");
-        byType.forEach((type, list) -> {
+        new TreeMap<>(byType).forEach((type, list) -> {
             double totalArea = list.stream()
                     .mapToDouble(Figure::getArea)
                     .sum();
@@ -47,33 +56,19 @@ public class FigureMapTasks {
             byColor.computeIfAbsent(fig.getColor(), k -> new HashSet<>()).add(fig);
         }
 
-        String anyColor = byColor.keySet().iterator().next();
-        Figure anyFig   = byColor.get(anyColor).iterator().next();
-
-        int sizeBefore = byColor.get(anyColor).size();
-        byColor.get(anyColor).add(anyFig);
-        int sizeAfter  = byColor.get(anyColor).size();
-
+        Set<Figure> blueSet = byColor.computeIfAbsent("blue", k -> new HashSet<>());
+        int before = blueSet.size();
+        blueSet.add(new Square(5, "blue"));
+        blueSet.add(new Square(5, "blue"));
+        int after = blueSet.size();
         System.out.printf(
-                "%nVerification: adding duplicate to Set[\"%s\"] — before: %d, after: %d → %s%n",
-                anyColor, sizeBefore, sizeAfter,
-                sizeBefore == sizeAfter ? "duplicate rejected ✓" : "duplicate added ✗"
-        );
-
-        System.out.println("\nVerification with two separate but equal objects:");
-        Square sq1 = new Square(5, "blue");
-        Square sq2 = new Square(5, "blue");
-        Set<Figure> testSet = new HashSet<>();
-        testSet.add(sq1);
-        testSet.add(sq2);
-        System.out.printf(
-                "  sq1.equals(sq2)=%b | testSet.size()=%d (expected 1) → %s%n",
-                sq1.equals(sq2), testSet.size(),
-                testSet.size() == 1 ? "equals/hashCode OK ✓" : "equals/hashCode BROKEN ✗"
+                "%nVerification: adding two equal Square(5, \"blue\") to byColor[\"blue\"] — before: %d, after: %d (expected +1) → %s%n",
+                before, after,
+                after - before == 1 ? "equals/hashCode OK ✓" : "equals/hashCode BROKEN ✗"
         );
 
         System.out.println("\nSet size by color:");
-        byColor.forEach((color, set) ->
+        new TreeMap<>(byColor).forEach((color, set) ->
                 System.out.printf("  %-8s → %d unique figures%n", color, set.size()));
 
 
@@ -82,7 +77,7 @@ public class FigureMapTasks {
 
         // list.sort()          — метод інтерфейсу List (з Java 8), делегує до Arrays.sort()
         // Collections.sort()   — статичний утилітний метод, сам делегує до list.sort()
-        // Для мене різниці немає обидва стабільні, результат такий саммий
+        // Для мене різниці немає обидва стабільні, результат такий самий
         // list.sort() є більш сучасним і читабельним, тому він
         List<Figure> sortedFigures = new ArrayList<>(figures);
         sortedFigures.sort(Comparator.comparingDouble(Figure::getArea).reversed());
@@ -105,16 +100,15 @@ public class FigureMapTasks {
             sumAndCount.merge(
                     fig.getColor(),
                     new double[]{fig.getArea(), 1},
-                    (existing, incoming) -> {
-                        existing[0] += incoming[0];
-                        existing[1] += incoming[1];
-                        return existing;
+                    (existing, incoming) -> new double[]{
+                            existing[0] + incoming[0],
+                            existing[1] + incoming[1]
                     }
             );
         }
 
         System.out.println("Average area by color:");
-        sumAndCount.forEach((color, arr) ->
+        new TreeMap<>(sumAndCount).forEach((color, arr) ->
                 System.out.printf("  %-8s : %.2f%n", color, arr[0] / arr[1]));
 
 

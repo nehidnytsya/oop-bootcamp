@@ -1,9 +1,15 @@
 package org.example;
 
-import org.example.figure.*;
+import org.example.figure.Circle;
+import org.example.figure.Figure;
 import org.example.supplier.FigureSupplier;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.TreeMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -25,7 +31,7 @@ public class FigureStreamTasks {
         task4Optional(figures);
     }
 
-        // ========== 1) LAMBDA + FILTER + COUNT ==========
+    // ========== 1) LAMBDA + FILTER + COUNT ==========
     private static void task1FilterAndCount(List<Figure> figures) {
         System.out.println("\n=== 1) LAMBDA + FILTER + COUNT ===");
 
@@ -38,19 +44,21 @@ public class FigureStreamTasks {
 
         Predicate<Figure> isRed = figure -> Objects.equals("red", figure.getColor());
 
+        Predicate<Figure> isLargeAndRed = isLarge.and(isRed);
+
         long largeAndRedCount = figures.stream()
-                .filter(isLarge.and(isRed))
+                .filter(isLargeAndRed)
                 .count();
         System.out.printf("Figures that are large AND red: %d%n", largeAndRedCount);
 
         System.out.println("\n--- Large and red figures (details) ---");
         figures.stream()
-                .filter(isLarge.and(isRed))
+                .filter(isLargeAndRed)
                 .forEach(fig -> System.out.printf("  %s [%s] area=%.2f%n",
                         fig.getClass().getSimpleName(), fig.getColor(), fig.getArea()));
     }
 
-        // ========== 2) MAP + COLLECT — LIST OF DESCRIPTIONS ==========
+    // ========== 2) MAP + COLLECT — LIST OF DESCRIPTIONS ==========
     private static void task2MapAndCollect(List<Figure> figures) {
         System.out.println("\n=== 2) MAP + COLLECT — LIST OF DESCRIPTIONS ===");
 
@@ -65,7 +73,7 @@ public class FigureStreamTasks {
         descriptions.forEach(System.out::println);
     }
 
-        // ========== 3) GROUPINGBY — COUNT BY TYPE ==========
+    // ========== 3) GROUPINGBY — COUNT BY TYPE ==========
     private static void task3GroupingBy(List<Figure> figures) {
         System.out.println("\n=== 3) GROUPINGBY — COUNT BY TYPE ===");
 
@@ -76,11 +84,11 @@ public class FigureStreamTasks {
                 ));
 
         System.out.println("Count by figure type:");
-        countByType.forEach((type, count) ->
+        new TreeMap<>(countByType).forEach((type, count) ->
                 System.out.printf("  %-22s: %d%n", type, count));
     }
 
-        // ========== 4) OPTIONAL — FIRST CIRCLE ==========
+    // ========== 4) OPTIONAL — FIRST CIRCLE ==========
     private static void task4Optional(List<Figure> figures) {
         System.out.println("\n=== 4) OPTIONAL — FIRST CIRCLE ===");
 
@@ -96,9 +104,8 @@ public class FigureStreamTasks {
                         fig.getArea()))
                 .orElse("No circle in the list"));
 
-        List<Figure> withoutCircles = figures.stream()
-                .filter(fig -> !(fig instanceof Circle))
-                .collect(Collectors.toUnmodifiableList());
+        List<Figure> withoutCircles = new ArrayList<>(figures);
+        withoutCircles.removeIf(fig -> fig instanceof Circle);
 
         System.out.println("\nTesting with a list that has NO circles:");
         System.out.printf("Size after removing circles: %d (was %d)%n",
@@ -121,7 +128,6 @@ public class FigureStreamTasks {
         System.out.println("orElseThrow:");
         try {
             Figure circle = firstCircle
-                    .map(Circle.class::cast)
                     .orElseThrow(() -> new RuntimeException("No circles in the list"));
             System.out.printf("  Got circle, area=%.2f%n", circle.getArea());
         } catch (RuntimeException e) {
