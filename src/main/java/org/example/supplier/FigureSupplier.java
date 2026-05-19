@@ -1,4 +1,6 @@
-package org.example;
+package org.example.supplier;
+
+import org.example.figure.*;
 
 import java.util.Random;
 
@@ -32,6 +34,6 @@ public class FigureSupplier {
     }
 
     public Figure getDefaultFigure() {
-        return new Circle(10, "white");
+        return new Circle();
     }
 }
