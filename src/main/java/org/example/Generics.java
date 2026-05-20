@@ -6,7 +6,7 @@ import org.example.storage.FigureStorage;
 import org.example.supplier.FigureSupplier;
 import org.example.util.AnnotationUtils;
 
-public class Main {
+public class Generics {
     public static void main(String[] args) {
         FigureStorage<Figure> storage = new FigureStorage<>();
         FigureSupplier supplier = new FigureSupplier();

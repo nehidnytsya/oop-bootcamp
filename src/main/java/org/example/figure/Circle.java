@@ -2,6 +2,8 @@ package org.example.figure;
 
 import org.example.annotation.DefaultArea;
 
+import java.util.Objects;
+
 public class Circle extends Figure {
     public static final double DEFAULT_RADIUS = 10.0;
     public static final String DEFAULT_COLOR = "white";
@@ -34,5 +36,19 @@ public class Circle extends Figure {
                 "Figure: circle, area: %.1f sq. units, radius: %.1f units, color: %s%n",
                 getArea(), radius, getColor()
         );
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        Circle circle = (Circle) o;
+        return Double.compare(radius, circle.radius) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), radius);
     }
 }

@@ -1,5 +1,7 @@
 package org.example.figure;
 
+import java.util.Objects;
+
 public class Rectangle extends Figure {
     private final double width;
     private final double height;
@@ -26,5 +28,20 @@ public class Rectangle extends Figure {
                 "Figure: rectangle, area: %.1f sq. units, width: %.1f units, height: %.1f units, color: %s%n",
                 getArea(), width, height, getColor()
         );
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        Rectangle rectangle = (Rectangle) o;
+        return Double.compare(width, rectangle.width) == 0 &&
+                Double.compare(height, rectangle.height) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), width, height);
     }
 }
